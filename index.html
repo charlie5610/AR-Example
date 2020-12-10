@@ -9,6 +9,18 @@
     </head>
 
     <body style="margin: 0; overflow: hidden;">
+        
+        <!--SLIDER TO CONTROL SPEED IN THIS DIV-->
+        <div align="center" style='position: fixed; top: 35px; width:100%; text-align: right; z-index: 1;'>
+                <input type=range id="speed" min=0 max=0.1 step=0.001 value=0.05 /><span id="sText" style="color:red">0.50X</span>
+        </div>
+        
+        <!--BUTTONS FOR SWITCHING ANIMATIONS -->
+        <div align="center" style='position: fixed; top: 65px; width:100%; text-align: right; z-index: 1;'>
+                <input type=button id="anim1" onclick=Animation1() value="Free Wheel"/>
+                <input type=button id="anim2" onclick=Animation2() value="Hold Ring Gear"/>
+        </div>
+        
         <a-scene
             vr-mode-ui="enabled: false;"
             loading-screen="enabled: false;"
@@ -49,19 +61,63 @@
         <script type="text/javascript"> 
             gltf = document.querySelector('#bowser-model');
             var scene = document.querySelector('a-scene');
-            inputSpeed = 0.5
+            inputSpeed = parseFloat(document.getElementById('speed').value)//VARIABLE TO CONTROL SPEED OF SUN GEAR
+            document.getElementById('anim1').disabled = true;//BUTTON DISABLED AT START BECAUSE ANIMATION ALREADY PLAYING
+            
+            
+            
+            //THIS ANIMATION WILL PLAY ON LOAD
             function BaseAnimation(){
-                mesh.children[0].rotateX(inputSpeed);
-                for (i = 3; i<6;i++){
-                    mesh.children[i].rotateX(-0.5*inputSpeed);
+                mesh.children[0].rotateX(inputSpeed);//BY ROTATING THE INPUT SHAFT WE ARE ALSO ROTATING THE SUN GEAR PARENT-CHILD RELATION
+                mesh.children[1].rotateX(-0.2*inputSpeed);//ROTATE THE RING GEAR
+                for (i = 0; i<3;i++){
+                    mesh.children[2].children[i].rotateX(-0.5*inputSpeed);//ROTATE THE PLANET GEARS WHICH ARE CHILDREN OF THE CARRIER
                 }
-                mesh.children[1].rotateX(-0.2*inputSpeed);
+                
             }
             
-            scene.addEventListener('loaded', function (e) {
-                mesh = gltf.getObject3D('mesh'); 
-                setInterval(BaseAnimation,25);
-            });            
+            //THIS ANIMATION WILL PLAY WHEN THE BUTTON IS PRESSED
+            function AltAnimation(){
+                mesh.children[0].rotateX(inputSpeed)//BY ROTATING THE INPUT SHAFT WE ARE ALSO ROTATING THE SUN GEAR PARENT-CHILD RELATION
+                mesh.children[2].rotateX(inputSpeed/6)//ROTATE THE CARRIER WHICH WILL ROTATE THE PLANETS AROUND THE CARRIER ORIGIN DUE TO PARENT-CHILD RELATION
+                for(i = 0; i < 3; i++){
+                    mesh.children[2].children[i].rotateX(-inputSpeed/2.4)//ROTATE PLANET GEARS ABOUT THEIR OWN AXES
+                }
+                
+            }
+            function Animation2(){
+                clearInterval(animation1)//STOPS THE BaseAnimation
+                animation2 = setInterval(AltAnimation,25)//CALLS THE ALTERNATE ANIMATION
+                document.getElementById('anim2').disabled = true;//DISABLES THE BUTTON TO PREVENT MULTIPLE INSTANCES OF setInterval running
+                document.getElementById('anim1').disabled = false;//ENABLE BUTTON TO SWITCH BACK TO BaseAnimation()
+            }
+            
+            //FUNCTION ATTACHED TO FREE WHEEL BUTTON
+            function Animation1(){
+                animation1 = setInterval(BaseAnimation,25);//CALLS ON THE FUNCTION BaseAnimation REPEATEDLY WITH 25ms PAUSE
+                if(animation2){//CHECKS IF animation2 IS NULL
+                    clearInterval(animation2)//STOPS PLAYING THE ALTERNATE ANIMATION
+                }
+                document.getElementById('anim2').disabled = false;//DISABLES THE BUTTON TO PREVENT MULTIPLE INSTANCES OF setInterval running
+                document.getElementById('anim1').disabled = true;//ENABLE BUTTON TO SWITCH BACK TO BaseAnimation()
+            }
+            
+            
+            function update(){
+                inputSpeed = parseFloat(document.getElementById('speed').value) //update the inputSpeed variable
+                document.getElementById('sText').innerHTML = (inputSpeed/0.1).toFixed(2) +"X"
+            }
+            
+            //LISTENS FOR ANY INPUT AND RUNS THE update() FUNCTION
+            document.getElementById("speed").addEventListener("input",update)
+            
+            scene.addEventListener('loaded', function (e) {//WAITS FOR THE SCENE TO BE LOADED BEFORE PULLING THE MESH
+                    mesh = gltf.getObject3D('mesh');//PULLS THE MESH OFF THE OBJECT AND SETS IT TO VARIABLE
+                console.log(mesh)    
+                Animation1()//INITIALIZES THE BASE ANIMATION 
+                    
+            });
+                       
         </script>
     </body>
 </html>
