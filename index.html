@@ -88,10 +88,10 @@
                 
             }
             function AltAnimation2(){
-                mesh.children[1].rotateX(1.2*inputSpeed);//ROTATE THE RING GEAR`
-                mesh.children[2].rotateX(inputSpeed)//ROTATE THE CARRIER WHICH WILL ROTATE THE PLANETS AROUND THE CARRIER ORIGIN DUE TO PARENT-CHILD RELATION
+                mesh.children[1].rotateX(1.2*inputSpeed/3);//ROTATE THE RING GEAR`
+                mesh.children[2].rotateX(inputSpeed/3)//ROTATE THE CARRIER WHICH WILL ROTATE THE PLANETS AROUND THE CARRIER ORIGIN DUE TO PARENT-CHILD RELATION
                 for(i = 0; i < 3; i++){
-                    mesh.children[2].children[i].rotateX(inputSpeed/2)//ROTATE PLANET GEARS ABOUT THEIR OWN AXES
+                    mesh.children[2].children[i].rotateX(inputSpeed/2/3)//ROTATE PLANET GEARS ABOUT THEIR OWN AXES
                 }
                 
             }
