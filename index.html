@@ -19,6 +19,7 @@
         <div align="center" style='position: fixed; top: 65px; width:100%; text-align: right; z-index: 1;'>
                 <input type=button id="anim1" onclick=Animation1() value="Free Wheel"/>
                 <input type=button id="anim2" onclick=Animation2() value="Hold Ring Gear"/>
+                <input type=button id="anim3" onclick=Animation3() value="Hold Sun Gear"/>
         </div>
         
         <a-scene
@@ -63,7 +64,8 @@
             var scene = document.querySelector('a-scene');
             inputSpeed = parseFloat(document.getElementById('speed').value)//VARIABLE TO CONTROL SPEED OF SUN GEAR
             document.getElementById('anim1').disabled = true;//BUTTON DISABLED AT START BECAUSE ANIMATION ALREADY PLAYING
-            
+            animation2 = null;
+            animation3 = null;
             
             
             //THIS ANIMATION WILL PLAY ON LOAD
@@ -85,9 +87,28 @@
                 }
                 
             }
+            function AltAnimation2(){
+                mesh.children[1].rotateX(1.2*inputSpeed);//ROTATE THE RING GEAR`
+                mesh.children[2].rotateX(inputSpeed)//ROTATE THE CARRIER WHICH WILL ROTATE THE PLANETS AROUND THE CARRIER ORIGIN DUE TO PARENT-CHILD RELATION
+                for(i = 0; i < 3; i++){
+                    mesh.children[2].children[i].rotateX(inputSpeed/2)//ROTATE PLANET GEARS ABOUT THEIR OWN AXES
+                }
+                
+            }
+            function Animation3(){
+                clearInterval(animation1)//STOPS THE BaseAnimation
+                clearInterval(animation2)
+                animation3 = setInterval(AltAnimation2,25)//CALLS THE ALTERNATE ANIMATION
+                document.getElementById('anim3').disabled = true;
+                document.getElementById('anim2').disabled = false;//DISABLES THE BUTTON TO PREVENT MULTIPLE INSTANCES OF setInterval running
+                document.getElementById('anim1').disabled = false;//ENABLE BUTTON TO SWITCH BACK TO BaseAnimation()
+            }
             function Animation2(){
                 clearInterval(animation1)//STOPS THE BaseAnimation
+                if(animation3){
+                clearInterval(animation3)}
                 animation2 = setInterval(AltAnimation,25)//CALLS THE ALTERNATE ANIMATION
+                document.getElementById('anim3').disabled = false;
                 document.getElementById('anim2').disabled = true;//DISABLES THE BUTTON TO PREVENT MULTIPLE INSTANCES OF setInterval running
                 document.getElementById('anim1').disabled = false;//ENABLE BUTTON TO SWITCH BACK TO BaseAnimation()
             }
@@ -98,6 +119,10 @@
                 if(animation2){//CHECKS IF animation2 IS NULL
                     clearInterval(animation2)//STOPS PLAYING THE ALTERNATE ANIMATION
                 }
+                if(animation3){
+                    clearInterval(animation3)
+                }
+                document.getElementById('anim3').disabled = false;
                 document.getElementById('anim2').disabled = false;//DISABLES THE BUTTON TO PREVENT MULTIPLE INSTANCES OF setInterval running
                 document.getElementById('anim1').disabled = true;//ENABLE BUTTON TO SWITCH BACK TO BaseAnimation()
             }
