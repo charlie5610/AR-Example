@@ -8,11 +8,3 @@ Once you have loaded the website and allowed access to your camera use the image
 
 <img style="text-align:center" src="https://raw.githubusercontent.com/charlie5610/AR-Example/master/assets/default-marker.png">
 
-
-
-<style type="text/css">
-  img {
-    text-align:center;
-  }
-</style>
-
